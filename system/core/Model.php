@@ -73,4 +73,16 @@ class CI_Model {
 		return get_instance()->$key;
 	}
 
+
+	//Hermes sanchez code
+
+	public function response($code,$message,$data,$status){
+		return array(
+			'code' 		=> $code,
+			'message' 	=> $message,
+			'data' 		=> $data,
+			'status' 	=> $status
+		);
+	}
+
 }

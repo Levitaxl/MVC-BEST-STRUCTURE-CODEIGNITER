@@ -8,26 +8,30 @@ class CreateProductCommand extends Validations
     private $price;
     private $quantity;
     private $description;
+    private $image;
     
     public function __construct($payload)
     { 
         parent::__construct();
 
-        $this->validate_is_isset($payload,'title');
-        $this->validate_is_isset($payload,'price');
-        $this->validate_is_isset($payload,'quantity');
-        $this->validate_is_isset($payload,'description');
+        $this->is_isset($payload,'title');
+        $this->is_isset($payload,'price');
+        $this->is_isset($payload,'quantity');
+        $this->is_isset($payload,'description');
+        $this->is_isset($_FILES,'image');
 
+        $this->is_empty($payload['title']);
+        $this->is_empty($payload['price']);
+        $this->is_empty($payload['quantity']);
+        $this->is_empty($payload['description']);
+        $this->is_numeric($payload['quantity']);
+
+        $this->image         =   $this->uploads($_FILES);
         $this->title        =   $payload['title'];
         $this->price        =   $payload['price'];
         $this->quantity     =   $payload['quantity'];
         $this->description  =   $payload['description'];
 
-        $this->validate_is_empty($this->title);
-        $this->validate_is_empty($this->price);
-        $this->validate_is_empty($this->quantity);
-        $this->validate_is_empty($this->description);
-        $this->validate_is_numeric($this->quantity);
     }
 
 	public function __invoke($payload){
@@ -84,4 +88,41 @@ class CreateProductCommand extends Validations
 
         return $this;
     }
+    
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    public function setImage($image)
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    private function uploads($image){
+        $archivos=array();
+        foreach($image as $key => $tmp_name) {
+            if($image["image"]["name"]) {
+                $filename = date("Y_h_i_s")."_".$image["image"]["name"]; 
+                $source = $image["image"]["tmp_name"];
+                //print_r($source);
+                $directorio = './application/images';
+                
+                if(!file_exists($directorio)) mkdir($directorio, 0777) or die("No se puede crear el directorio de extracci&oacute;n");	
+                
+                $replace = str_replace(' ', '_', $filename);
+                $target_path = $directorio.'/'.$replace; 
+                if(move_uploaded_file($source, $target_path)) array_push($archivos, $replace);                    
+            }
+        }
+
+        return  $archivos[0];    
+    }
+
+
+
+
+   
 }
