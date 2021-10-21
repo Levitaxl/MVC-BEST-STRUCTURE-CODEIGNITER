@@ -12,14 +12,15 @@ class CreateProductController extends CI_Controller {
 	public function CreateProduct(){
 
         $payload= $this->input->post();
+        if($payload){ 
+            $this->load->model('commands/product/CreateProductCommand','createProductCommand', false, $payload);
+            $this->load->model('models/product/CreateProductModel','createProductModel',false);
+            $this->load->model('services/product/CreateProductService','createProductService',false,$this->createProductModel);
         
-        $this->load->model('commands/product/CreateProductCommand','createProductCommand', false, $payload);
-        $this->load->model('models/product/CreateProductModel','createProductModel',false);
-        $this->load->model('services/product/CreateProductService','createProductService',false,$this->createProductModel);
-       
-        $response= $this->createProductService->__invoke($this->createProductCommand);
-        
-        header('Content-type: application/json');
-        echo json_encode( $response );
+            $response= $this->createProductService->__invoke($this->createProductCommand);
+            
+            header('Content-type: application/json');
+            echo json_encode( $response );
+        }
 	}
 }
